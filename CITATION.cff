@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: "Battery Capacity-Curve Generation with Delay-Embedding DDPM"
+message: "If you use this software in your research, please cite the accompanying paper."
+type: software
+authors:
+  - family-names: "TBD"
+    given-names: "TBD"
+repository-code: "https://github.com/.../battery-de-ddpm"
+license: MIT
+preferred-citation:
+  type: article
+  title: "TBD"
+  authors:
+    - family-names: "TBD"
+      given-names: "TBD"
+  journal: "TBD"
+  year: 2026

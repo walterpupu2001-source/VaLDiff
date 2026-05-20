@@ -1,0 +1,32 @@
+# ============================================================
+# Vanilla β-VAE (Block-2 unconditional baseline)
+# Values copied verbatim from the original Block-2 Vanilla-VAE script.
+# ============================================================
+
+model_name: "vanilla_vae"
+seed: 42
+
+dataset:
+  seq_len: 384              # must be divisible by 16
+
+model:
+  latent_dim: 32            # VAEs typically use a small latent space
+  hidden_ch: 64
+
+training:
+  epochs: 400
+  batch_size: 8
+  learning_rate: 1.0e-3
+  kl_weight: 0.0005         # β coefficient (the "β" of β-VAE)
+  scheduler_patience: 20
+  scheduler_factor: 0.5
+  save_every: 100
+
+evaluation:
+  num_samples_to_gen: 5
+
+paths:
+  prepared_pkl: "outputs/prepared_data.pkl"
+  ckpt_dir: "outputs/ckpt/vanilla_vae"
+  metrics_csv: "outputs/metrics/vanilla_vae.csv"
+  figures_dir: "outputs/figures/vanilla_vae"

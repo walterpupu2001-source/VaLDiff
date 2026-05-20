@@ -1,0 +1,38 @@
+# ============================================================
+# Resampled-DE / DE-DDPM (Block-2 comparison method)
+# Values copied verbatim from the original Block-2 Resampled-DE script.
+# ============================================================
+
+model_name: "resampled_de"
+seed: 42
+
+dataset:
+  img_size: 32              # DE image side (n)
+  seq_len: 500              # resample target length
+
+model:
+  base_ch: 128
+  cond_dim: 13              # 13 physics features
+  t_dim: 128
+  use_upblock: false        # Resampled-DE uses ConvTranspose2d
+
+ddpm:
+  t_steps: 1000
+  beta_start: 1.0e-4
+  beta_end: 1.0e-2
+
+training:
+  epochs: 400               # 400 in original Block-2 Resampled-DE
+  batch_size: 8
+  learning_rate: 1.0e-4
+  grad_clip_norm: 1.0
+  save_every: 100
+
+evaluation:
+  num_samples_to_gen: 5
+
+paths:
+  prepared_pkl: "outputs/prepared_data.pkl"
+  ckpt_dir: "outputs/ckpt/resampled_de"
+  metrics_csv: "outputs/metrics/resampled_de.csv"
+  figures_dir: "outputs/figures/resampled_de"

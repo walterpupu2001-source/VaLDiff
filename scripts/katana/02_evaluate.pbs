@@ -1,0 +1,45 @@
+#!/bin/bash
+# ============================================================
+# Katana PBS job: Block 3 - downstream SOH prediction evaluation
+# 3 tasks x 9 methods x 8 predictors x 5 runs = 1080 training runs
+# Most predictors are tiny (MLP/CNN/RNN/LSTM/Transformer/PatchTST/Informer/iTransformer)
+# Wall time budget: 6 hours (V100 ~3-4h, A100 ~2-3h)
+# Requires: outputs/prepared_data.pkl AND all 5 ckpts to exist
+# ============================================================
+#PBS -N battery_evaluate
+#PBS -l select=1:ncpus=8:ngpus=1:mem=46gb
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#PBS -o logs/02_evaluate.log
+
+set -e
+
+cd "$PBS_O_WORKDIR"
+mkdir -p logs outputs/eval_downstream
+
+source scripts/katana/activate_env.sh
+
+echo "============================================================"
+echo "Job:        02_evaluate"
+echo "Started:    $(date)"
+echo "Host:       $(hostname)"
+nvidia-smi -L 2>/dev/null || true
+echo "============================================================"
+echo "Checkpoint inventory:"
+ls -lh outputs/ckpt/proposed/final.pt        2>/dev/null || echo "  MISSING: proposed"
+ls -lh outputs/ckpt/resampled_de/final.pt    2>/dev/null || echo "  MISSING: resampled_de"
+ls -lh outputs/ckpt/1d_ddpm/final.pt         2>/dev/null || echo "  MISSING: 1d_ddpm"
+ls -lh outputs/ckpt/vanilla_gan/vanilla_gan.pt 2>/dev/null || echo "  MISSING: vanilla_gan"
+ls -lh outputs/ckpt/vanilla_vae/vanilla_vae.pt 2>/dev/null || echo "  MISSING: vanilla_vae"
+echo "============================================================"
+
+python scripts/evaluate_downstream.py
+
+echo "============================================================"
+echo "Finished:   $(date)"
+echo "Output:     outputs/eval_downstream/metrics.csv"
+echo "============================================================"
+ls -lh outputs/eval_downstream/metrics.csv
+echo ""
+echo "First 5 rows of metrics:"
+head -6 outputs/eval_downstream/metrics.csv

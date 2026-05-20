@@ -1,0 +1,33 @@
+#!/bin/bash
+# ============================================================
+# Katana PBS job: Block 2 - Vanilla GAN
+# 400 epochs, latent 128, seq_len=384, spectral norm in D, label smoothing
+# Wall time budget: 1 hour (V100 ~20min, A100 ~12min)
+# ============================================================
+#PBS -N battery_vanilla_gan
+#PBS -l select=1:ncpus=8:ngpus=1:mem=46gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+#PBS -o logs/01_train_vanilla_gan.log
+
+set -e
+
+cd "$PBS_O_WORKDIR"
+mkdir -p logs outputs/ckpt/vanilla_gan
+
+source scripts/katana/activate_env.sh
+
+echo "============================================================"
+echo "Job:        01_train_vanilla_gan"
+echo "Started:    $(date)"
+echo "Host:       $(hostname)"
+nvidia-smi -L 2>/dev/null || true
+echo "============================================================"
+
+python scripts/train_vanilla_gan.py
+
+echo "============================================================"
+echo "Finished:   $(date)"
+echo "Output:     outputs/ckpt/vanilla_gan/vanilla_gan.pt"
+echo "============================================================"
+ls -lh outputs/ckpt/vanilla_gan/vanilla_gan.pt

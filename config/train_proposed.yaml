@@ -1,0 +1,40 @@
+# ============================================================
+# Proposed: Auto-DE + UpBlock2D + Masked Loss + Padding Constraint
+# Values copied verbatim from the original Block-2 Proposed script.
+# ============================================================
+
+model_name: "proposed"
+seed: 42
+
+dataset:
+  img_size: 32              # DE image side (n)
+  # no seq_len — Proposed uses adaptive DE (no resampling)
+
+model:
+  base_ch: 128
+  cond_dim: 13              # 13 physics features
+  t_dim: 128
+  use_upblock: true         # Proposed uses UpBlock2D (resize-conv)
+
+ddpm:
+  t_steps: 1000
+  beta_start: 1.0e-4
+  beta_end: 1.0e-2
+
+training:
+  epochs: 500               # 500 in original Block-2 Proposed
+  batch_size: 8
+  learning_rate: 1.0e-4
+  grad_clip_norm: 1.0
+  save_every: 100
+  use_masked_loss: true     # ★ Proposed-specific
+  use_padding_constraint: true   # ★ Proposed-specific
+
+evaluation:
+  num_samples_to_gen: 5
+
+paths:
+  prepared_pkl: "outputs/prepared_data.pkl"
+  ckpt_dir: "outputs/ckpt/proposed"
+  metrics_csv: "outputs/metrics/proposed.csv"
+  figures_dir: "outputs/figures/proposed"

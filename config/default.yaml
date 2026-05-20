@@ -1,0 +1,26 @@
+# ============================================================
+# Default global configuration.
+# These values match the originals from the .ipynb experiments
+# and MUST NOT be changed if you want to reproduce paper results.
+# ============================================================
+
+# Reproducibility
+seed: 42                  # Used by data preparation and Block-2 generative models
+downstream_seed: 2026     # Used by Block-3 downstream evaluation
+
+# Project paths (relative to the project root)
+paths:
+  data_root: "data/raw"
+  outputs: "outputs"
+  prepared_pkl: "outputs/prepared_data.pkl"
+
+# Data split (used by Block 1)
+split:
+  ratios: [0.7, 0.15, 0.15]    # train / val / test (per batch)
+
+# Batches present in data_root
+batches: ["Batch-1", "Batch-2", "Batch-3", "Batch-4", "Batch-5"]
+
+# SOH definition (used by Block 3)
+soh:
+  q_nominal_ah: 2.0

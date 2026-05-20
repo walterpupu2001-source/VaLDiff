@@ -1,0 +1,85 @@
+# ============================================================
+# Block 3: Downstream evaluation (SOH prediction)
+# Values copied verbatim from the original Block-3 script.
+# ============================================================
+
+seed: 2026
+num_runs: 5
+
+# ----- Training (per downstream model) -----
+downstream:
+  epochs: 100
+  batch_size: 32
+  learning_rate: 1.0e-3
+  patience: 15
+
+# ----- Capacity → SOH conversion -----
+soh:
+  q_nominal_ah: 2.0
+  buffer: 0.05
+
+# ----- Augmentation -----
+augmentation:
+  num_aug_per_battery: 5
+
+# ----- Geometry consistent with Block 2 -----
+geometry:
+  img_size_2d: 32
+  seq_len_1d: 384
+  seq_len_resampled: 500
+
+# ----- Methods evaluated -----
+# Order matters because Block 3 ranks methods in this order in the output.
+method_order:
+  - Baseline
+  - Proposed
+  - DE-DDPM
+  - DDPM
+  - GAN
+  - VAE
+  - GaussianNoise
+  - TimeWarping
+
+# ----- Downstream prediction tasks (Block 3 TASKS list verbatim) -----
+# Format: (name, input_size, output_size, fixed_len, input_ratio)
+# input_size = fixed_len * input_ratio
+# output_size = fixed_len - input_size
+tasks:
+  SOH_30to70:
+    input_size: 150
+    output_size: 350
+    fixed_len: 500
+    input_ratio: 0.3
+  SOH_40to60:
+    input_size: 200
+    output_size: 300
+    fixed_len: 500
+    input_ratio: 0.4
+  SOH_50to50:
+    input_size: 250
+    output_size: 250
+    fixed_len: 500
+    input_ratio: 0.5
+
+# ----- Predictor list (Block 3 MODEL_CLASSES keys verbatim) -----
+predictors:
+  - MLP
+  - CNN
+  - RNN
+  - LSTM
+  - Transformer
+  - PatchTST
+  - Informer
+  - iTransformer
+
+# ----- Paths -----
+paths:
+  prepared_pkl: "outputs/prepared_data.pkl"
+  curves_cache_dir: "outputs/curves"
+  results_dir: "outputs/eval_downstream"
+  ckpt_paths:
+    Proposed:   "outputs/ckpt/proposed/final.pt"
+    DE-DDPM:    "outputs/ckpt/resampled_de/final.pt"
+    DDPM:       "outputs/ckpt/1d_ddpm/final.pt"
+    GAN:        "outputs/ckpt/vanilla_gan/vanilla_gan.pt"
+    VAE:        "outputs/ckpt/vanilla_vae/vanilla_vae.pt"

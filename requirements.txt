@@ -1,0 +1,27 @@
+# =============================================================================
+# Requirements for the battery-de-ddpm project.
+#
+# Tested on Python 3.10 + PyTorch 2.5 (Windows 11 with CUDA 12.1 and Linux).
+# Lower-bound pins reflect the oldest versions known to work; upper bounds
+# pin major versions to guard against breaking API changes.
+#
+# For GPU support, install a CUDA-matched torch build separately from
+# https://pytorch.org/get-started/locally/ BEFORE running:
+#     pip install -r requirements.txt
+# =============================================================================
+
+# ----- Core scientific stack -----
+numpy>=1.23,<2.0          # 2.x breaks many downstream packages; keep on 1.x
+scipy>=1.10               # .ndimage.zoom, .interpolate.CubicSpline, .io.loadmat, .stats
+matplotlib>=3.7           # plotting (loss curves, per-battery visualisations)
+
+# ----- Deep learning -----
+torch>=2.0                # works with 2.0–2.5; bit-identical results require the
+                          # *same* torch + CUDA combo as the original training
+                          # (cross-machine differences appear only after ~7 decimal places)
+
+# ----- Configuration -----
+pyyaml>=6.0               # YAML loader for config/*.yaml
+
+# ----- Testing (dev-only, optional for inference-only users) -----
+pytest>=7.0

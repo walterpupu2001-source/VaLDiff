@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# XJTU 数据 — 不上传（数据集有自己的版权）
+data/raw/Batch-*/*.mat
+data/raw/CALCE/
+
+# 大体积输出 — 走 GitHub Release，不进主仓
+outputs/ckpt/
+outputs/curves/
+outputs/figures/
+outputs/predictions_soh/
+outputs/prepared_data.pkl
+outputs/eval_downstream/results.pkl
+outputs/eval_downstream/predictions_soh/
+
+# 但要保留 metrics.csv 作为复现证明
+!outputs/eval_downstream/metrics.csv
+!outputs/reference_metrics.csv
+
+# 日志
+logs/
+
+# IDE / OS 杂项
+.vscode/
+.idea/
+.DS_Store
+*.swp

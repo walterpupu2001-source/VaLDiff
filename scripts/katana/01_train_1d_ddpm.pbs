@@ -1,0 +1,33 @@
+#!/bin/bash
+# ============================================================
+# Katana PBS job: Block 2 - 1D conditional DDPM (vanilla baseline)
+# 500 epochs, seq_len=384, UNet1D
+# Wall time budget: 2 hours (V100 ~1h, A100 ~40min)
+# ============================================================
+#PBS -N battery_1d_ddpm
+#PBS -l select=1:ncpus=8:ngpus=1:mem=46gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+#PBS -o logs/01_train_1d_ddpm.log
+
+set -e
+
+cd "$PBS_O_WORKDIR"
+mkdir -p logs outputs/ckpt/1d_ddpm
+
+source scripts/katana/activate_env.sh
+
+echo "============================================================"
+echo "Job:        01_train_1d_ddpm"
+echo "Started:    $(date)"
+echo "Host:       $(hostname)"
+nvidia-smi -L 2>/dev/null || true
+echo "============================================================"
+
+python scripts/train_1d_ddpm.py
+
+echo "============================================================"
+echo "Finished:   $(date)"
+echo "Output:     outputs/ckpt/1d_ddpm/final.pt"
+echo "============================================================"
+ls -lh outputs/ckpt/1d_ddpm/final.pt

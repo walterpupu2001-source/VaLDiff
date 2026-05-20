@@ -1,0 +1,34 @@
+#!/bin/bash
+# ============================================================
+# Katana PBS job: Block 2 - Proposed (Auto-DE + UpBlock2D)
+# 500 epochs, batch 8, complex UpBlock2D, masked MSE + padding constraint
+# Wall time budget: 6 hours (V100 ~3h, A100 ~2h)
+# ============================================================
+#PBS -N battery_proposed
+#PBS -l select=1:ncpus=8:ngpus=1:mem=46gb
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#PBS -o logs/01_train_proposed.log
+
+set -e
+
+cd "$PBS_O_WORKDIR"
+mkdir -p logs outputs/ckpt/proposed
+
+source scripts/katana/activate_env.sh
+
+echo "============================================================"
+echo "Job:        01_train_proposed"
+echo "Started:    $(date)"
+echo "Host:       $(hostname)"
+echo "GPU info:"
+nvidia-smi -L 2>/dev/null || echo "  (nvidia-smi not available)"
+echo "============================================================"
+
+python scripts/train_proposed.py
+
+echo "============================================================"
+echo "Finished:   $(date)"
+echo "Output:     outputs/ckpt/proposed/final.pt"
+echo "============================================================"
+ls -lh outputs/ckpt/proposed/final.pt

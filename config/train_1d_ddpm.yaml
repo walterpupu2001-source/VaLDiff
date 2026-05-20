@@ -1,0 +1,37 @@
+# ============================================================
+# 1D Conditional DDPM (Block-2 baseline)
+# Values copied verbatim from the original Block-2 1D-DDPM script.
+# DO NOT CHANGE these to reproduce paper results.
+# ============================================================
+
+model_name: "1d_ddpm"
+seed: 42
+
+dataset:
+  seq_len: 384            # must be divisible by 4 (two ×2 downsamples)
+
+model:
+  base_ch: 128
+  cond_dim: 13            # 13 physics features
+  t_dim: 128
+
+ddpm:
+  t_steps: 1000
+  beta_start: 1.0e-4
+  beta_end: 1.0e-2
+
+training:
+  epochs: 500
+  batch_size: 8
+  learning_rate: 1.0e-4
+  grad_clip_norm: 1.0
+  save_every: 100         # save intermediate checkpoint every N epochs
+
+evaluation:
+  num_samples_to_gen: 5
+
+paths:
+  prepared_pkl: "outputs/prepared_data.pkl"
+  ckpt_dir: "outputs/ckpt/1d_ddpm"
+  metrics_csv: "outputs/metrics/1d_ddpm.csv"
+  figures_dir: "outputs/figures/1d_ddpm"

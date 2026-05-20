@@ -1,0 +1,35 @@
+# ============================================================
+# Vanilla GAN (Block-2 unconditional baseline)
+# Values copied verbatim from the original Block-2 Vanilla-GAN script.
+# ============================================================
+
+model_name: "vanilla_gan"
+seed: 42
+
+dataset:
+  seq_len: 384              # must be divisible by 16
+
+model:
+  latent_dim: 128
+  g_ch: 64
+  d_ch: 64
+
+training:
+  epochs: 400
+  batch_size: 8
+  lr_g: 2.0e-4
+  lr_d: 1.0e-4
+  adam_betas: [0.5, 0.999]
+  label_smooth_real: 0.9    # one-sided label smoothing
+  label_smooth_fake: 0.1
+  noise_std: 0.05           # instance noise added to D inputs
+  save_every: 100
+
+evaluation:
+  num_samples_to_gen: 5
+
+paths:
+  prepared_pkl: "outputs/prepared_data.pkl"
+  ckpt_dir: "outputs/ckpt/vanilla_gan"
+  metrics_csv: "outputs/metrics/vanilla_gan.csv"
+  figures_dir: "outputs/figures/vanilla_gan"
