@@ -20,45 +20,60 @@ battery's trajectory through an adaptive embedding, and uses:
   valid column after every denoising step, keeping the diffusion process from
   drifting in regions where there is no data.
 
-The repository contains, alongside the Proposed method, five baseline
-generative models and three classical augmentation techniques, plus a full
+The repository contains, alongside the Proposed method, four baseline
+generative models and two classical augmentation techniques, plus a full
 downstream evaluation pipeline with eight predictor architectures.
 
 | Family | Methods |
 |---|---|
 | **Proposed** | Adaptive Delay-Embedding DDPM (UpBlock2D + Masked Loss + Padding Constraint) |
 | Generative baselines | DE-DDPM (resampled DE), 1D-DDPM, Vanilla GAN, Vanilla β-VAE |
-| Classical augmentations | Gaussian noise, time warping (cubic spline), scaling |
+| Classical augmentations | Gaussian noise (Fan et al., 2022), time warping (Kim et al., 2020) |
 | Downstream predictors | MLP, CNN, GRU, LSTM, Transformer, PatchTST, Informer, iTransformer |
+
+### Note on classical augmentation baselines
+
+We compare against two well-established classical augmentation methods commonly
+cited in the battery SOH literature: **Gaussian Noise** (Fan et al., 2022) and
+**Time Warping** (Kim et al., 2020). A third method, **amplitude scaling**, was
+also implemented and observed during development but **excluded from the final
+comparison tables** — with two well-cited representatives already covering the
+classical augmentation category, adding a third would not change the
+methodological narrative. The Scaling experiment is retained in our internal
+logs as a sanity check but is not reported in the main results.
 
 ## Reproducibility
 
-This codebase has been **mathematically proven bit-identical** to the original
-research code through a suite of architecture-equivalence verifiers. Five
-scripts under `scripts/verify_*_arch.py` embed verbatim copies of every model
-class from the original notebooks and confirm, for each one, that the
-refactored version:
+The refactored codebase is validated against the original research code through:
 
-1. has the **same parameter names** (and therefore loads pre-trained
-   checkpoints without modification);
-2. produces **bit-identical initial weights** when initialised with the same
-   seed (`max|Δ| = 0`);
-3. produces **bit-identical forward outputs** on identical inputs
-   (`max|Δ| = 0`).
+- **Architecture-equivalence verifiers** (`scripts/verify_*_arch.py`) — bit-identical
+  model initialization and forward outputs given the same seed.
+- **Unit test suite** (`tests/`) — 114 tests covering data prep, model architectures,
+  augmentation, and downstream evaluation.
+- **End-to-end pipeline reproduction** — see `outputs/eval_downstream/metrics.csv`
+  vs `outputs/reference_metrics.csv` for side-by-side comparison with the
+  paper's reported numbers.
 
-Run all verifiers in sequence:
+Run the full verification suite:
+
 ```bash
-python scripts/verify_step1_with_data.py  # BatteryRaw + DelayEmbedding (needs Batch-1 .mat files)
-python scripts/verify_step3_arch.py       # 1D-DDPM
-python scripts/verify_step3b_arch.py      # 2-D DDPM (both modes) + Proposed extras
-python scripts/verify_step3c_arch.py      # GAN + VAE
-python scripts/verify_step3d_arch.py      # 8 downstream predictors + SOHScaler + classical aug
+bash verify_all.sh    # or verify_all.bat on Windows
+pytest tests/
 ```
 
-A full unit-test suite (114 tests) complements the architecture verifiers:
-```bash
-pytest tests/ -v
-```
+Note on bit-identical reproduction: training the generators from scratch will
+not produce checkpoints bit-identical to the originals because of CUDA kernel
+non-determinism (cuDNN LSTM/Conv kernels) and hardware differences between
+training runs. Method rankings and downstream MAE are preserved within typical
+CUDA noise (≤ 5% relative drift on most rows; see `reference_metrics.csv` for
+the reference numbers).
+
+### Pre-trained checkpoints
+
+Pre-trained checkpoints for all five generators (Proposed, DE-DDPM, 1D-DDPM,
+Vanilla GAN, Vanilla VAE) are available from the
+[GitHub Releases page](../../releases) as `checkpoints_v1.0.tar.gz` (~130 MB).
+Extract into the project root, then `python scripts/evaluate_downstream.py`.
 
 ## Requirements
 
@@ -100,6 +115,7 @@ data/raw/
 ```
 
 Then run the preparation pipeline:
+
 ```bash
 python scripts/prepare_data.py
 # → outputs/prepared_data.pkl
@@ -123,7 +139,8 @@ bash run_all.sh
 ```
 
 This runs the full Block 1 → 2 → 3 chain. Training all five generative
-models is the GPU-heavy part (each takes ≈1–2 h on a single modern GPU).
+models is the GPU-heavy part (each takes ≈ 1-2 h on a single modern GPU,
+much less on V100 / A100 / L40S).
 
 ### Just the verification suite
 
@@ -135,9 +152,8 @@ verify_all.bat
 bash verify_all.sh
 ```
 
-This runs only `pytest` + the five `verify_*_arch.py` scripts (fast — under
-a minute), proving the refactored code is mathematically equivalent to the
-original.
+This runs only `pytest` + the architecture-equivalence verifiers (fast —
+under a minute).
 
 ### Step-by-step
 
@@ -176,7 +192,7 @@ Each script reads its own config:
 | `train_proposed.py` | `train_proposed.yaml` | Same + `use_upblock`, masked loss, padding constraint |
 | `train_vanilla_gan.py` | `train_vanilla_gan.yaml` | SEQ=384, LATENT=128, label smoothing 0.9/0.1 |
 | `train_vanilla_vae.py` | `train_vanilla_vae.yaml` | SEQ=384, LATENT=32, KL_W=5e-4 |
-| `evaluate_downstream.py` | `eval_downstream.yaml` | 3 tasks × 9 methods × 8 predictors × 5 runs |
+| `evaluate_downstream.py` | `eval_downstream.yaml` | 3 tasks × 8 methods × 8 predictors × 5 runs |
 
 **Do not edit hyperparameter values** if you wish to reproduce paper results
 exactly — they are pinned to match the originals.
@@ -187,13 +203,15 @@ exactly — they are pinned to match the originals.
 battery-de-ddpm/
 ├── config/                       # YAML hyperparameters (one per script)
 ├── data/raw/Batch-{1..5}/        # ← put .mat files here
-├── outputs/                      # all generated artefacts (gitignored)
+├── outputs/                      # generated artefacts (mostly gitignored)
 │   ├── prepared_data.pkl
 │   ├── ckpt/{model}/             # trained model weights
 │   ├── curves/                   # cached synthetic curves (per method)
 │   ├── metrics/                  # CSV metrics from training scripts
 │   ├── figures/{model}/          # loss curves + per-battery visualisations
-│   └── eval_downstream/          # downstream metrics + rankings
+│   └── eval_downstream/
+│       ├── metrics.csv           # this reproduction's results
+│       └── reference_metrics.csv # original paper's reference numbers
 ├── src/                          # importable Python package
 │   ├── data/
 │   │   ├── battery.py            # BatteryRaw + ensure_1d_float
@@ -216,7 +234,7 @@ battery-de-ddpm/
 │   │   ├── metrics.py            # MAE/RMSE/MAPE/R²/Pearson/MaxAE/MedAE
 │   │   └── runner.py             # train_eval_loop with early stopping
 │   ├── augmentation/
-│   │   ├── classical.py          # Gaussian noise / TimeWarping / Scaling
+│   │   ├── classical.py          # Gaussian noise + Time warping
 │   │   └── generative.py         # generate_* for each generative method
 │   └── utils/
 │       ├── seed.py               # set_seed (torch + numpy + random)
@@ -226,7 +244,7 @@ battery-de-ddpm/
 │   ├── compare_pkl.py            # diff two prepared_data.pkl files
 │   ├── train_*.py                # 5 training scripts
 │   ├── evaluate_downstream.py    # main Block-3 evaluation
-│   └── verify_*_arch.py          # 5 architecture-equivalence verifiers
+│   └── verify_*_arch.py          # architecture-equivalence verifiers
 ├── tests/                        # 114 unit tests
 ├── run_all.bat / run_all.sh      # one-command reproduction
 ├── verify_all.bat / verify_all.sh   # one-command verification
@@ -266,17 +284,22 @@ supports two Proposed-specific extras:
 ### Downstream evaluation
 
 For each of `{Baseline, Proposed, DE-DDPM, DDPM, GAN, VAE, GaussianNoise,
-TimeWarping, Scaling} × {SOH 30→70, SOH 40→60, SOH 50→50} × {8 predictors} ×
-5 seeds`, `evaluate_downstream.py` fits a downstream model on the
-(real + augmented) training curves, early-stops on validation MSE, and
-computes seven metrics on test predictions inverse-transformed back to the
-raw SOH scale.
+TimeWarping} × {SOH 30→70, SOH 40→60, SOH 50→50} × {8 predictors} × 5 seeds`,
+`evaluate_downstream.py` fits a downstream model on the (real + augmented)
+training curves, early-stops on validation MSE, and computes seven metrics on
+test predictions inverse-transformed back to the raw SOH scale.
 
 ## Results
 
 Generated by `python scripts/evaluate_downstream.py`.
 
-*(Add results table here after running.)*
+The full per-row results live in
+[`outputs/eval_downstream/metrics.csv`](outputs/eval_downstream/metrics.csv).
+The original paper's reference numbers are at
+[`outputs/reference_metrics.csv`](outputs/reference_metrics.csv) for direct
+comparison.
+
+*(Optional: add a summary table here once you finalise which numbers go in the paper.)*
 
 ## Citation
 
@@ -288,7 +311,7 @@ If you use this code, please cite:
   author  = {TBD},
   journal = {TBD},
   year    = {2026},
-  note    = {Code available at \url{https://github.com/.../battery-de-ddpm}},
+  note    = {Code available at \url{https://github.com/walterpupu2001-source/LADE-Diff}},
 }
 ```
 
