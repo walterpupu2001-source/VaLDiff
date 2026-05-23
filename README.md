@@ -1,6 +1,6 @@
-# Battery Capacity-Curve Generation with Delay-Embedding DDPM
+# LADE-Diff: Conditional Diffusion-Based Battery Degradation Trajectory Generation for Early SOH Prediction under Data Scarcity
 
-> Official code release accompanying the paper *(title TBD)*.
+> Official code release accompanying the paper *LADE-Diff: Conditional Diffusion-Based Battery Degradation Trajectory Generation for Early SOH Prediction under Data Scarcity*.
 > Generates full lithium-ion battery capacity-degradation trajectories from
 > early-cycle observations using a conditional Delay-Embedding diffusion model,
 > and uses the synthetic trajectories to augment downstream State-of-Health (SOH)
