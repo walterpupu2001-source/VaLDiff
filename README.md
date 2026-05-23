@@ -317,7 +317,7 @@ If you use this code, please cite:
 
 ## Acknowledgements
 
-This work uses the **XJTU battery dataset** *(add reference here)*.
+This work uses the **XJTU battery dataset**.
 
 The downstream predictors implement architectures from:
 - **PatchTST** — Nie *et al.*, "A Time Series Is Worth 64 Words: Long-Term Forecasting with Transformers", ICLR 2023.
