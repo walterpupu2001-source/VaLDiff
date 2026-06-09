@@ -102,7 +102,7 @@ python -m pip install -r requirements.txt
 ## Data
 
 The experiments use the **XJTU battery dataset** (Q_nominal = 2.0 Ah).
-*(Add download link here.)* After downloading, place the `.mat` files under
+*(https://wang-fujin.github.io/)* After downloading, place the `.mat` files under
 `data/raw/`:
 
 ```
