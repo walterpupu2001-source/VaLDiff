@@ -299,7 +299,7 @@ The original paper's reference numbers are at
 [`outputs/reference_metrics.csv`](outputs/reference_metrics.csv) for direct
 comparison.
 
-*(Optional: add a summary table here once you finalise which numbers go in the paper.)*
+
 
 ## Citation
 
