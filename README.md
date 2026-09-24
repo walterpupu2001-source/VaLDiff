@@ -1,6 +1,6 @@
-# LADE-Diff: Conditional Diffusion-Based Battery Degradation Trajectory Generation for Early SOH Prediction under Data Scarcity
+# VaLDiff: Variable-Length Battery Degradation Trajectory Augmentation via Adaptive Delay Embedding and Conditional Diffusion
 
-> Official code release accompanying the paper *LADE-Diff: Conditional Diffusion-Based Battery Degradation Trajectory Generation for Early SOH Prediction under Data Scarcity*.
+> Official code release accompanying the paper *VaLDiff: Variable-Length Battery Degradation Trajectory Augmentation via Adaptive Delay Embedding and Conditional Diffusion*.
 > Generates full lithium-ion battery capacity-degradation trajectories from
 > early-cycle observations using a conditional Delay-Embedding diffusion model,
 > and uses the synthetic trajectories to augment downstream State-of-Health (SOH)
@@ -311,7 +311,7 @@ If you use this code, please cite:
   author  = {TBD},
   journal = {TBD},
   year    = {2026},
-  note    = {Code available at \url{https://github.com/walterpupu2001-source/LADE-Diff}},
+  note    = {Code available at \url{https://github.com/walterpupu2001-source/VaLDiff}},
 }
 ```
 
